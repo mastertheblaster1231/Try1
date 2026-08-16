@@ -13,7 +13,8 @@
 #include "Try1.h"
 #include "InterfaceComponents/AnimationInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
-
+#include "CharacterActionComponents/ClimbComponent/ClimbComponent.h"
+#include "CharacterActionComponents/LineTraceComponent/LineTraceComponent.h"
 ATry1Character::ATry1Character()
 {
 	// Set size for collision capsule
@@ -50,6 +51,10 @@ ATry1Character::ATry1Character()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+	
+	/*AttachedComponents*/
+	ClimbComponent = CreateDefaultSubobject<UClimbComponent>(TEXT("ClimbComponent"));
+	LineTraceComponent = CreateDefaultSubobject<ULineTraceComponent>(TEXT("LineTraceComponent"));
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -77,6 +82,10 @@ void ATry1Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		
 		//crouching
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ATry1Character::DoCrouch);
+		
+		//Interaction
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started ,this , &ATry1Character::Interact);
+		
 	}
 	else
 	{
@@ -88,6 +97,7 @@ void ATry1Character::BeginPlay()
 {
 	Super::BeginPlay();
 	SetPlayerAnimInstance(); //setting animation Instance for player
+	
 }
 
 void ATry1Character::Move(const FInputActionValue& Value)
@@ -201,7 +211,6 @@ void ATry1Character::DoCrouch()
 	}
 	bplayerCrouching = !bplayerCrouching;
 	AnimationSetter(PlayerAnimationState); //setting Animation States
-
 }
 
 
@@ -226,6 +235,26 @@ bool ATry1Character::UnCrouchObjectDection()
 		true);
 	
 	return HitResult.bBlockingHit;
+}
+
+void ATry1Character::Interact()
+{
+	if (LineTraceComponent)
+	{
+		FVector PlayerStartLocation;
+		FRotator PlayerRotation;
+		GetController()->GetPlayerViewPoint(PlayerStartLocation , PlayerRotation);
+		FVector EndLocation = PlayerStartLocation + (PlayerRotation.Vector().XAxisVector* 1000);
+		
+		FHitResult HitResult = LineTraceComponent->ShootInteractivetrace(PlayerStartLocation , EndLocation , 10.0f );
+		if (HitResult.bBlockingHit)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Hitted Object"));
+	
+		}
+	}
+
+	
 }
 
 //Animation Player_ref Setter

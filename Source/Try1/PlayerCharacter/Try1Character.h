@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerCharacterState.h"
+
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Try1Character.generated.h"
@@ -11,6 +12,8 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
+class UClimbComponent;
+class ULineTraceComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -68,6 +71,14 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Input")	
 	UInputAction* CrouchAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* InteractAction;
+#pragma endregion
+	
+#pragma region AttachedComponents
+	UClimbComponent* ClimbComponent;
+	ULineTraceComponent* LineTraceComponent;
 #pragma endregion
 	
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -141,6 +152,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	bool UnCrouchObjectDection();
+	
+	UFUNCTION(BlueprintCallable, Category="Input")
+	void Interact();
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void SetPlayerAnimInstance();
