@@ -15,6 +15,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "CharacterActionComponents/ClimbComponent/ClimbComponent.h"
 #include "CharacterActionComponents/LineTraceComponent/LineTraceComponent.h"
+#include "Enums/ObjectIsFor.h"
+#include "InterfaceComponents/InteractItemInterface.h"
+
 ATry1Character::ATry1Character()
 {
 	// Set size for collision capsule
@@ -42,15 +45,16 @@ ATry1Character::ATry1Character()
 	
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	/*CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f;
-	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->TargetArmLength = 400.0f;*/
+	//CameraBoom->bUsePawnControlRotation = true;
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+	FollowCamera->SetupAttachment(GetMesh() , FName("neck_01"));
+	/*FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;*/
 	
 	/*AttachedComponents*/
 	ClimbComponent = CreateDefaultSubobject<UClimbComponent>(TEXT("ClimbComponent"));
@@ -244,17 +248,18 @@ void ATry1Character::Interact()
 		FVector PlayerStartLocation;
 		FRotator PlayerRotation;
 		GetController()->GetPlayerViewPoint(PlayerStartLocation , PlayerRotation);
-		FVector EndLocation = PlayerStartLocation + (PlayerRotation.Vector().XAxisVector* 1000);
+		FVector EndLocation = PlayerStartLocation + (PlayerRotation.Vector().GetSafeNormal()*1000);
 		
-		FHitResult HitResult = LineTraceComponent->ShootInteractivetrace(PlayerStartLocation , EndLocation , 10.0f );
+		FHitResult HitResult = LineTraceComponent->ShootInteractivetrace(PlayerStartLocation ,EndLocation ,10.0f );
 		if (HitResult.bBlockingHit)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Hitted Object"));
-	
+			if (HitResult.GetActor() && HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractItemInterface::StaticClass()))
+			{
+				IInteractItemInterface::Execute_InteractInterface(HitResult.GetActor());
+			}
 		}
 	}
-
-	
 }
 
 //Animation Player_ref Setter
