@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameActors/TaskActors/BaseGameObject.h"
 #include "ClimbComponent.generated.h"
 
 class UGetOwnerOfComponent;
+class ATry1Character;
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TRY1_API UClimbComponent : public UActorComponent
 {
@@ -19,10 +21,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UGetOwnerOfComponent* GetOwnerComponent;
 	UPROPERTY(VisibleAnywhere, Category = "Climb")
-	AActor* possessor;
+	ATry1Character* possessor;
+	UPROPERTY(EditAnywhere, Category = "Climb")
+	float HeightOfLadder;
+	UPROPERTY(EditAnywhere, Category = "Climb")
+	float heightOfPlayer;
+	UPROPERTY(EditAnywhere, Category = "Climb")
+	float RequiredHeightToClimb;
 	
 	UFUNCTION(BlueprintCallable)
-	void ClimbAction();
+	void ClimbAction(ABaseGameObject* GameActor , FVector ImpactNormal);
+	UFUNCTION(BlueprintCallable)
+	void RecheckHeight();
 	
 
 protected:

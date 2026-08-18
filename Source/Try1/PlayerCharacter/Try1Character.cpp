@@ -1,11 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Try1Character.h"
-#include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -16,7 +14,8 @@
 #include "CharacterActionComponents/ClimbComponent/ClimbComponent.h"
 #include "CharacterActionComponents/LineTraceComponent/LineTraceComponent.h"
 #include "Enums/ObjectIsFor.h"
-#include "InterfaceComponents/InteractItemInterface.h"
+#include "GameActors/TaskActors/BaseGameObject.h"
+
 
 ATry1Character::ATry1Character()
 {
@@ -72,9 +71,13 @@ void ATry1Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		//ExitClimbInteraction
+		EnhancedInputComponent->BindAction(JumpAction , ETriggerEvent::Started,this  , &ATry1Character::ExitClimb);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATry1Character::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ATry1Character::StopMovement);
+		
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ATry1Character::Look);
 
 		// Looking
@@ -89,6 +92,8 @@ void ATry1Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		
 		//Interaction
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started ,this , &ATry1Character::Interact);
+		
+		
 		
 	}
 	else
@@ -113,6 +118,13 @@ void ATry1Character::Move(const FInputActionValue& Value)
 	DoMove(MovementVector.X, MovementVector.Y);
 }
 
+void ATry1Character::StopMovement()
+{
+	if (isClimbing){
+		GetCharacterMovement()->StopMovementImmediately();
+	}
+}
+
 void ATry1Character::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -124,21 +136,41 @@ void ATry1Character::Look(const FInputActionValue& Value)
 
 void ATry1Character::DoMove(float Right, float Forward)
 {
+	if (Right == 0 && Forward == 0)return;
+	
 	if (GetController() != nullptr)
-	{
+	{	
+		if (isClimbing)
+		{
+			float character_movespeed = 50.0f;
+			FVector velocity = GetCharacterMovement()->Velocity;
+			velocity.Z = character_movespeed;
+			GetCharacterMovement()->Velocity = Forward * velocity;
+			
+			AddMovementInput(FVector::UpVector , Forward);
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f , FColor::Red , FString::Printf(TEXT("Forward : %f"), Forward ));
+			ClimbComponent->RecheckHeight();
+		}else
+		{
+			const FRotator Rotation = GetController()->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
+	
+			// get forward vector
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			
+
+			// get right vector 
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+			// add movement 
+			AddMovementInput(ForwardDirection, Forward);
+			AddMovementInput(RightDirection, Right);
+
+		}
+	
 		// find out which way is forward
-		const FRotator Rotation = GetController()->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+     	
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, Forward);
-		AddMovementInput(RightDirection, Right);
 	}
 }
 
@@ -155,13 +187,30 @@ void ATry1Character::DoLook(float Yaw, float Pitch)
 void ATry1Character::DoJumpStart()
 {
 	// signal the character to jump
+	if (isClimbing)
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+	}
 	Jump();
+	
 }
 
 void ATry1Character::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+
+}
+
+void ATry1Character::ExitClimb()
+{
+	if (isClimbing)
+	{
+		isClimbing = false;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Exitingclimb"));
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		GetCharacterMovement()->GravityScale  = 1.0f;
+	}
 }
 
 #pragma region RunFunction
@@ -254,10 +303,22 @@ void ATry1Character::Interact()
 		if (HitResult.bBlockingHit)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Hitted Object"));
-			if (HitResult.GetActor() && HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractItemInterface::StaticClass()))
-			{
-				IInteractItemInterface::Execute_InteractInterface(HitResult.GetActor());
-			}
+			
+				ABaseGameObject* GameActor  =  Cast<ABaseGameObject>(HitResult.GetActor());	
+				if (GameActor)
+				{
+					switch (GameActor->ObjectIsFor)
+					{
+					case EObjectIsFor::Climb:
+						ClimbComponent->ClimbAction(GameActor , HitResult.ImpactNormal);
+						break;
+					case EObjectIsFor::None:
+						
+						break;
+					default:
+						break;
+					}
+				}
 		}
 	}
 }
@@ -271,6 +332,7 @@ void ATry1Character::SetPlayerAnimInstance()
 		
 }
 #pragma endregion
+
 
 //Animation Enum Setter
 #pragma region AnimationStateSetter
@@ -287,4 +349,4 @@ void ATry1Character::AnimationSetter(EPlayerCharacterState PlayerPresentState)
 		SetPlayerAnimInstance();
 	}
 }
-#pragma endregion 
+#pragma endregion

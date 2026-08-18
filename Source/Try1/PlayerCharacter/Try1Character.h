@@ -44,6 +44,7 @@ class ATry1Character : public ACharacter
 	
 	UPROPERTY(EditAnywhere, Category= "CharacterMovement", meta = (AllowPrivateAccess = "true"))
 	float PlayerNormalWalkSpeed = 300.0f;
+
 	
 	
 #pragma  endregion 
@@ -81,11 +82,12 @@ protected:
 	ULineTraceComponent* LineTraceComponent;
 #pragma endregion
 	
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditAnywhere, Category="bools")
 	bool bisrunning;
 	
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditAnywhere, Category="bools")
 	bool bplayerCrouching;
+	
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Input")
 	EPlayerCharacterState PlayerAnimationState;  
@@ -104,6 +106,13 @@ public:
 
 	/** Constructor */
 	ATry1Character();	
+		
+	UPROPERTY(EditAnywhere, Category="bools")
+	bool bIsOnLadder;
+	UPROPERTY(EditAnywhere, Category= "bools")
+	bool bisClimbInteracted;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category  = "bools")
+	bool isClimbing;
 
 protected:
 
@@ -115,6 +124,7 @@ protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
+	void StopMovement();
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
@@ -136,6 +146,9 @@ public:
 	/** Handles jump pressed inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
+	
+	UFUNCTION()
+	void ExitClimb();
 
 	
 	
