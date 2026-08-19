@@ -10,8 +10,6 @@ enum class EPlayerCharacterState : uint8
 	Walking UMETA(DisplayName = "Walking"),
 	Runing UMETA(DisplayName = "Running"),
 	Crouch UMETA(DisplayName = "Crouch"),
-	ClimbIdle UMETA(DisplayName = "ClimbIdle"),
-	ClimbUp UMETA(DisplayName = "ClimbUp"),
-	ClimbDown UMETA(DisplayName = "ClimbDown"),
+	Climb UMETA(DisplayName = "Climb"),
 	UnCrouch UMETA(DisplayName = "UnCrouch"),
 };

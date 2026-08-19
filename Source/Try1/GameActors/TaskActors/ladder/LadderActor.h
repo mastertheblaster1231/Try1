@@ -23,7 +23,7 @@ public:
 	UBoxComponent* StartBoxComp;
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* EndBoxComp;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* PlayerPostion;
 	
 	

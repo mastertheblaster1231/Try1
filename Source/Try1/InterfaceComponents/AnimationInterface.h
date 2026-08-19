@@ -23,5 +23,5 @@ class TRY1_API IAnimationInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent , Blueprintable)
-	void ShareAnimationData(EPlayerCharacterState AnimationStateUpdate);
+	void ShareAnimationData(EPlayerCharacterState AnimationStateUpdate , EPlayerCharacterClimbAnimationStates PlayerAnimationClimbState);
 };

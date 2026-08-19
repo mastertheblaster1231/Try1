@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerCharacterState.h"
+#include "Enums/PlayerCharacterClimbAnimationStates.h"
 
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
@@ -89,8 +90,10 @@ protected:
 	bool bplayerCrouching;
 	
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Input")
-	EPlayerCharacterState PlayerAnimationState;  
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Enums")
+	EPlayerCharacterState PlayerAnimationState; 
+	UPROPERTY(EditAnywhere, Category="Enums")
+	EPlayerCharacterClimbAnimationStates ClimbAnimation;
 	
 	UPROPERTY(EditAnywhere)
 	UAnimInstance* PlayerAnim_Ref;
@@ -172,7 +175,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void SetPlayerAnimInstance();
 	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void AnimationSetter(EPlayerCharacterState PlayerPresentState);
+	virtual void AnimationSetter(EPlayerCharacterState PlayerPresentState, EPlayerCharacterClimbAnimationStates PlayerAnimationClimbState);
 
 
 #pragma endregion

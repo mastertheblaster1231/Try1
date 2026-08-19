@@ -122,6 +122,7 @@ void ATry1Character::StopMovement()
 {
 	if (isClimbing){
 		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->Velocity.Z = 0.0f;
 	}
 }
 
@@ -149,7 +150,17 @@ void ATry1Character::DoMove(float Right, float Forward)
 			
 			AddMovementInput(FVector::UpVector , Forward);
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f , FColor::Red , FString::Printf(TEXT("Forward : %f"), Forward ));
+			
+			
+			 if (GetCharacterMovement()->Velocity.Z > 1)
+			{
+				AnimationSetter(EPlayerCharacterState::Climb , EPlayerCharacterClimbAnimationStates::climbup);
+			}else if (GetCharacterMovement()->Velocity.Z < -1)
+			{
+				AnimationSetter(EPlayerCharacterState::Climb , EPlayerCharacterClimbAnimationStates::climbdown);
+			}
 			ClimbComponent->RecheckHeight();
+			
 		}else
 		{
 			const FRotator Rotation = GetController()->GetControlRotation();
@@ -157,20 +168,14 @@ void ATry1Character::DoMove(float Right, float Forward)
 	
 			// get forward vector
 			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-			
 
 			// get right vector 
 			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
 			// add movement 
 			AddMovementInput(ForwardDirection, Forward);
 			AddMovementInput(RightDirection, Right);
-
 		}
-	
 		// find out which way is forward
-     	
-
 	}
 }
 
@@ -187,10 +192,6 @@ void ATry1Character::DoLook(float Yaw, float Pitch)
 void ATry1Character::DoJumpStart()
 {
 	// signal the character to jump
-	if (isClimbing)
-	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
-	}
 	Jump();
 	
 }
@@ -208,6 +209,8 @@ void ATry1Character::ExitClimb()
 	{
 		isClimbing = false;
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Exitingclimb"));
+		AnimationSetter(EPlayerCharacterState::None , EPlayerCharacterClimbAnimationStates::climbup);
+		GetCharacterMovement()->bUseControllerDesiredRotation = false;
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 		GetCharacterMovement()->GravityScale  = 1.0f;
 	}
@@ -263,7 +266,7 @@ void ATry1Character::DoCrouch()
 		}
 	}
 	bplayerCrouching = !bplayerCrouching;
-	AnimationSetter(PlayerAnimationState); //setting Animation States
+	AnimationSetter(PlayerAnimationState , EPlayerCharacterClimbAnimationStates::None); //setting Animation States
 }
 
 
@@ -336,13 +339,13 @@ void ATry1Character::SetPlayerAnimInstance()
 
 //Animation Enum Setter
 #pragma region AnimationStateSetter
-void ATry1Character::AnimationSetter(EPlayerCharacterState PlayerPresentState)
+void ATry1Character::AnimationSetter(EPlayerCharacterState PlayerPresentState , EPlayerCharacterClimbAnimationStates PlayerAnimationClimbState)
 {
 	if (PlayerAnim_Ref != nullptr)
 	{
 		if (PlayerAnim_Ref->GetClass()->ImplementsInterface(UAnimationInterface::StaticClass()))
 		{
-			IAnimationInterface::Execute_ShareAnimationData(PlayerAnim_Ref , PlayerPresentState);
+			IAnimationInterface::Execute_ShareAnimationData(PlayerAnim_Ref , PlayerPresentState , PlayerAnimationClimbState);
 		}
 	}else
 	{

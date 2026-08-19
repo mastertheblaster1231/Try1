@@ -2,6 +2,8 @@
 
 
 #include "ClimbComponent.h"
+
+#include "Camera/CameraComponent.h"
 #include "CharacterActionComponents/GettingOwnerComponent/GetOwnerOfComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerCharacter/Try1Character.h"
@@ -34,6 +36,8 @@ void UClimbComponent::ClimbAction(ABaseGameObject* GameActor, FVector ImpactNorm
 			 RequiredHeightToClimb = HeightOfLadder-heightOfPlayer; 
 			//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("Climb Size: %f"), heightOfPlayer));
 			//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("Climb Size: %f"), RequiredHeightToClimb));	
+			possessor->GetCharacterMovement()->bUseControllerDesiredRotation = false;
+			possessor->AnimationSetter(EPlayerCharacterState::Climb , EPlayerCharacterClimbAnimationStates::climbIdle); //AnimationState
 			possessor->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 			possessor->GetCharacterMovement()->GravityScale = 0.0f;
 			possessor->isClimbing = true;
@@ -58,8 +62,14 @@ void UClimbComponent::RecheckHeight()
 			possessor->GetCharacterMovement()->StopMovementImmediately();
 			/*FVector GetEdge = FVector(0.0f , 0.0f, 200.0f);
 			possessor->GetCharacterMovement()->AddForce(GetEdge);*/
-			possessor->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+			possessor->GetCharacterMovement()->bUseControllerDesiredRotation = true;
+			possessor->GetCharacterMovement()->SetMovementMode(MOVE_Walking);	
+			possessor->GetCharacterMovement()->AddForce(FVector::UpVector * 500);
+			possessor->GetCharacterMovement()->AddForce(FVector::ForwardVector*100);
 			possessor->GetCharacterMovement()->GravityScale = 1.0f;
+			possessor->AnimationSetter(EPlayerCharacterState::Idle, EPlayerCharacterClimbAnimationStates::climbIdle);
+			
+			
 			possessor->isClimbing = false;
 			
 		}
