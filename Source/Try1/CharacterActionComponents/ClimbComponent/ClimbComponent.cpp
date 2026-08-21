@@ -36,7 +36,7 @@ void UClimbComponent::ClimbAction(ABaseGameObject* GameActor, FVector ImpactNorm
 			
 			if (LadderRef != nullptr)
 			{
-				possessor->GetCapsuleComponent()->SetWorldLocation(LadderRef->StartPlayerPostion->GetComponentLocation());
+			//	possessor->GetCapsuleComponent()->SetWorldLocation(LadderRef->StartPlayerPostion->GetComponentLocation());
 			}
 			HeightOfLadder = GameActor->GetActorScale3D().Z*100.0f;
 			heightOfPlayer = possessor->GetActorScale3D().Z*100.0f;

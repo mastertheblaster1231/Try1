@@ -69,6 +69,11 @@ void ALadderActor::End_BeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Start component Start overlap"));
+	ATry1Character* PlayerCharacter = Cast<ATry1Character>(OtherActor);
+	if (PlayerCharacter != nullptr)
+	{
+		PlayerCharacter->bisClimbInteracted = false;
+	}
 	
 }
 
