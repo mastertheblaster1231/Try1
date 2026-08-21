@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameActors/TaskActors/BaseGameObject.h"
+#include "GameActors/TaskActors/ladder/LadderActor.h"
 #include "ClimbComponent.generated.h"
 
 class UGetOwnerOfComponent;
@@ -29,10 +30,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Climb")
 	float RequiredHeightToClimb;
 	
+	TObjectPtr<ALadderActor> LadderRef;
+	
 	UFUNCTION(BlueprintCallable)
 	void ClimbAction(ABaseGameObject* GameActor , FVector ImpactNormal);
 	UFUNCTION(BlueprintCallable)
 	void RecheckHeight();
+	/*UFUNCTION()
+	void MontageFinished(UAnimMontage* Montage, bool bInterrupted);
+	*/
 	
 
 protected:

@@ -13,13 +13,15 @@ ALadderActor::ALadderActor()
 	LadderMesh = CreateDefaultSubobject<UStaticMeshComponent>("LadderMesh");
 	StartBoxComp =  CreateDefaultSubobject<UBoxComponent>(TEXT("StartBoxCollision"));
 	EndBoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("EndBoxCollision"));
-	PlayerPostion = CreateDefaultSubobject<USkeletalMeshComponent>("PlayerPostion");
-	PlayerPostion->SetupAttachment(LadderMesh);	
+	
+	StartPlayerPostion = CreateDefaultSubobject<USkeletalMeshComponent>("StartPlayerPostion");
+	StartPlayerPostion->SetupAttachment(LadderMesh);	
+	
+	EndPlayerPostion = CreateDefaultSubobject<USkeletalMeshComponent>("EndPlayerPosition");
+	EndPlayerPostion->SetupAttachment(LadderMesh);
 	
 	StartBoxComp->SetupAttachment(LadderMesh);
 	EndBoxComp->SetupAttachment(LadderMesh);
-	
-	
 }
 
 // Called when the game starts or when spawned
@@ -40,6 +42,7 @@ void ALadderActor::Start_BeginOverLap(UPrimitiveComponent* OverlappedComponent, 
 {
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Start overlap"));
 	ATry1Character* PlayerCharacter = Cast<ATry1Character>(OtherActor);
+	FVector Location  = StartBoxComp->GetComponentLocation();
 	
 	
 		if (PlayerCharacter)

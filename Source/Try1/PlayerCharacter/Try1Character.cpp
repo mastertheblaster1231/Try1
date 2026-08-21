@@ -92,9 +92,6 @@ void ATry1Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		
 		//Interaction
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started ,this , &ATry1Character::Interact);
-		
-		
-		
 	}
 	else
 	{
@@ -123,7 +120,7 @@ void ATry1Character::StopMovement()
 	if (isClimbing){
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->Velocity.Z = 0.0f;
-	}
+	}	
 }
 
 void ATry1Character::Look(const FInputActionValue& Value)
@@ -332,6 +329,7 @@ void ATry1Character::SetPlayerAnimInstance()
 {
 	PlayerAnim_Ref = Cast<UAnimInstance>(GetMesh()->GetAnimInstance());
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("SettedAnimationInstance"));
+	
 		
 }
 #pragma endregion
@@ -352,4 +350,6 @@ void ATry1Character::AnimationSetter(EPlayerCharacterState PlayerPresentState , 
 		SetPlayerAnimInstance();
 	}
 }
+
+
 #pragma endregion

@@ -95,8 +95,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Enums")
 	EPlayerCharacterClimbAnimationStates ClimbAnimation;
 	
-	UPROPERTY(EditAnywhere)
-	UAnimInstance* PlayerAnim_Ref;
+	
 	
 	
 	
@@ -116,6 +115,11 @@ public:
 	bool bisClimbInteracted;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category  = "bools")
 	bool isClimbing;
+	
+	UPROPERTY(EditAnywhere , Blueprintable)
+	UAnimMontage*AnimMontage;
+	UPROPERTY(EditAnywhere , Blueprintable)
+	UAnimInstance* PlayerAnim_Ref;
 
 protected:
 
@@ -152,6 +156,8 @@ public:
 	
 	UFUNCTION()
 	void ExitClimb();
+	
+	
 
 	
 	
@@ -176,6 +182,8 @@ public:
 	virtual void SetPlayerAnimInstance();
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void AnimationSetter(EPlayerCharacterState PlayerPresentState, EPlayerCharacterClimbAnimationStates PlayerAnimationClimbState);
+	UFUNCTION(BlueprintImplementableEvent)
+	void ExecuteLedgeClimb();
 
 
 #pragma endregion

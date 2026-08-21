@@ -24,7 +24,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* EndBoxComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USkeletalMeshComponent* PlayerPostion;
+	TObjectPtr<USkeletalMeshComponent> StartPlayerPostion;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USkeletalMeshComponent> EndPlayerPostion;
 	
 	
 
