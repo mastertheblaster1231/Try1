@@ -80,7 +80,8 @@ protected:
 	
 #pragma region AttachedComponents
 	UClimbComponent* ClimbComponent;
-	ULineTraceComponent* LineTraceComponent;
+		UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		ULineTraceComponent* LineTraceComponent;
 #pragma endregion
 	
 	UPROPERTY(EditAnywhere, Category="bools")

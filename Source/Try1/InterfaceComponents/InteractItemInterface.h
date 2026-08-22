@@ -22,6 +22,6 @@ class TRY1_API IInteractItemInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintNativeEvent ,Blueprintable)
+	UFUNCTION(BlueprintNativeEvent ,BlueprintCallable)
 	void InteractInterface();
 };

@@ -291,7 +291,7 @@ bool ATry1Character::UnCrouchObjectDection()
 }
 
 void ATry1Character::Interact()
-{
+{	
 	if (LineTraceComponent)
 	{
 		FVector PlayerStartLocation;
@@ -305,15 +305,16 @@ void ATry1Character::Interact()
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Hitted Object"));
 			
 				ABaseGameObject* GameActor  =  Cast<ABaseGameObject>(HitResult.GetActor());	
-				if (GameActor)
+				if (GameActor && GameActor->GetClass()->ImplementsInterface(UInteractItemInterface::StaticClass()))
 				{
 					switch (GameActor->ObjectIsFor)
 					{
 					case EObjectIsFor::Climb:
 						ClimbComponent->ClimbAction(GameActor , HitResult.ImpactNormal);
 						break;
-					case EObjectIsFor::None:
-						
+					case EObjectIsFor::DoorAction:
+						GEngine->AddOnScreenDebugMessage(-1 , 3.0f, FColor::Yellow, TEXT("DoorAction Running"));
+						IInteractItemInterface::Execute_InteractInterface(GameActor);
 						break;
 					default:
 						break;
